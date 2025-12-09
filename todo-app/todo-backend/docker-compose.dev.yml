@@ -1,4 +1,4 @@
-services:
+services: 
   mongo:
     image: mongo:6
     ports:
@@ -9,9 +9,12 @@ services:
       MONGO_INITDB_DATABASE: the_database
     volumes:
       - ./mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
   redis:
     image: redis
     ports:
       - "6378:6379"
     environment:
       REDIS_URL: 'redis://localhost:6378'
+    volumes:
+      - ./redis-data:/data

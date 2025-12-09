@@ -1,5 +1,4 @@
 const redis = require('redis')
-const { promisify } = require('util')
 const { REDIS_URL } = require('../util/config')
 
 let getAsync
@@ -16,9 +15,27 @@ if (!REDIS_URL) {
   const client = redis.createClient({
     url: REDIS_URL
   })
-    
-  getAsync = promisify(client.get).bind(client)
-  setAsync = promisify(client.set).bind(client)    
+  
+  client.on('error', (err) => console.error('Redis error:', err))
+  client.on('ready', () => console.log('Redis connected'))
+  
+  getAsync = (key) => {
+    return new Promise((resolve, reject) => {
+      client.get(key, (err, data) => {
+        if (err) reject(err)
+        else resolve(data)
+      })
+    })
+  }
+  
+  setAsync = (key, value) => {
+    return new Promise((resolve, reject) => {
+      client.set(key, value, (err, result) => {
+        if (err) reject(err)
+        else resolve(result)
+      })
+    })
+  }
 }
 
 module.exports = {
